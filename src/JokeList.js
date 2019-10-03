@@ -11,12 +11,20 @@ class JokeList extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      jokes: []
+      jokes: JSON.parse(window.localStorage.getItem("jokes") || "[]"),
+      loading: false
     }
+    this.seenJokes = new Set(this.state.jokes.map(j => j.text));
+    this.handleClick = this.handleClick.bind(this);
     this.handleVote = this.handleVote.bind(this);
   }
 
-  async componentDidMount() {
+  componentDidMount() {
+    if(this.state.jokes.length === 0) this.getJokes();
+  }
+
+  async getJokes() {
+    try {
     // Load List of Jokes from API
     let jokes = [];
     // Populate jokes array with the amount of jokes specefied in default props
@@ -25,34 +33,64 @@ class JokeList extends Component {
       let response = await axios.get("https://icanhazdadjoke.com/", {
         headers: { Accept: "application/json" }
       });
-      jokes.push({ id: uuid(), text: response.data.joke, votes: 0 })
+      let newJoke = response.data.joke
+      if(!this.seenJokes.has(newJoke)) {
+        jokes.push({ id: uuid(), text: newJoke, votes: 0 })
+      } else {
+        console.log("DUPE")
+      }
     }
-    this.setState({ jokes: jokes })
+    this.setState( st => ({
+      loading: false,
+      jokes: [...st.jokes, ...jokes]
+    }),
+    () => window.localStorage.setItem("jokes", JSON.stringify(this.state.jokes))
+  );
+  } catch(e) {
+    alert(e)
+    this.setState({ loading: false })
   }
+}
 
-  handleVote(id, delta) {
-    this.setState(
-      st => ({
-        jokes: st.jokes.map(j =>
-          j.id === id ? {...j, votes: j.votes + delta} : j
-        )
-      })
+handleClick() {
+  this.getJokes();
+  this.setState({ loading: true }, this.getJokes);
+}
+
+handleVote(id, delta) {
+  this.setState(
+    st => ({
+      jokes: st.jokes.map(j =>
+        j.id === id ? {...j, votes: j.votes + delta} : j
+      )
+    }),
+    () => window.localStorage.setItem("jokes", JSON.stringify(this.state.jokes))
+  );
+}
+
+render() {
+
+  if(this.state.loading) {
+    return (
+      <div className="JokeList-spinner">
+        <i className="far fa-8x fa-laugh fa-spin" />
+        <h1 className="JokeList-title">Loading...</h1>
+      </div>
     )
   }
-
-  render() {
-    console.log(this.state.jokes)
-    return(
-      <div className="JokeList">
-        <div className="JokeList-sidebar">
-          <h1 className="JokeList-title">
+  let jokes = this.state.jokes.sort((a,b) => b.votes - a.votes)
+  return(
+    <div className="JokeList">
+      <div className="JokeList-sidebar">
+        <h1 className="JokeList-title">
           <span>Dad</span>
            Jokes
          </h1>
-         <img src="https://assets.dryicons.com/uploads/icon/svg/8927/0eb14c71-38f2-433a-bfc8-23d9c99b3647.svg" />
+         <img className="shake" src="https://assets.dryicons.com/uploads/icon/svg/8927/0eb14c71-38f2-433a-bfc8-23d9c99b3647.svg" />
+         <button className="JokeList-button" onClick={this.handleClick}>New Jokes</button>
         </div>
         <div className="JokeList-jokes">
-          {this.state.jokes.map(j => (
+          {jokes.map(j => (
             <Joke
               key={j.id}
               votes={j.votes}

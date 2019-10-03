@@ -17,6 +17,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   width: 30%;
   text-align: center;
   border-radius: 5px;
@@ -38,6 +39,13 @@
   border-radius: 50%;
   box-shadow: 4px 7px 13px -6px rgba(0,0,0,0.75);
 }
+.JokeList-sidebar img:hover {
+  -webkit-animation-name: shakeit;
+  -webkit-animation-duration: 0.8s;
+  -webkit-transform-origin:50% 50%;
+  -webkit-animation-iteration-count: infinite;
+  -webkit-animation-timing-function: linear;
+}
 .JokeList-jokes {
   height: 90%;
   background-color: white;
@@ -46,4 +54,44 @@
   overflow: scroll;
   padding: 1rem;
   width: 70%;
+}
+
+.JokeList-spinner, .JokeList-spinner h1 {
+    color: #FF5254;
+    text-align: center;
+}
+
+.JokeList-button {
+  box-shadow: 1px 5px 15px -6px rgba(0,0,0,0.75);
+  color: white;
+  border: none;
+  border-radius: 20px;
+  margin-top: 50px;
+  width: 140px;
+  height: 40px;
+  font-size: 20px;
+  font-weight: 700;
+
+  background-color: #CEE879;
+  cursor: pointer;
+  transition: .8s cubic-bezier(0.2, 1, 0.2, 1);
+}
+
+.JokeList-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 1px 3px 10px -3px rgba(0,0,0,0.75);
+}
+
+@keyframes shakeit {
+	0% { transform: translate(2px, 1px) rotate(0deg); }
+	10% { transform: translate(-1px, -2px) rotate(-1deg); }
+	20% { transform: translate(-3px, 0px) rotate(1deg); }
+	30% { transform: translate(0px, 2px) rotate(0deg); }
+	40% { transform: translate(1px, -1px) rotate(1deg); }
+	50% { transform: translate(-1px, 2px) rotate(-1deg); }
+	60% { transform: translate(-3px, 1px) rotate(0deg); }
+	70% { transform: translate(2px, 1px) rotate(-1deg); }
+	80% { transform: translate(-1px, -1px) rotate(1deg); }
+	90% { transform: translate(2px, 2px) rotate(0deg); }
+	100% { transform: translate(1px, -2px) rotate(-1deg); }
 }
